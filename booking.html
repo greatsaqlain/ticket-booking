@@ -1,77 +1,80 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Payment</title>
+<title>Movie Booking</title>
 
 <style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial;
-}
-
 body{
-background:linear-gradient(135deg,#000000,#1a1a2e,#16213e);
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
+margin:0;
+font-family:Arial;
+background:#111;
 color:white;
 }
 
+.nav{
+background:#000;
+padding:15px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
 .container{
-background:#111;
-padding:30px;
-border-radius:12px;
-width:400px;
-box-shadow:0 20px 40px rgba(0,0,0,0.6);
+width:800px;
+margin:auto;
+padding:20px;
 }
 
-h2{
-margin-bottom:20px;
+.screen{
+background:white;
+height:100px;
+margin:20px 0;
+transform:rotateX(-45deg);
+box-shadow:0 10px 20px rgba(255,255,255,0.5);
 }
 
-.select{
-margin-bottom:15px;
+.seats{
+display:grid;
+grid-template-columns:repeat(8,1fr);
+gap:10px;
 }
 
-input,select{
-width:100%;
-padding:12px;
-border:none;
-margin-top:5px;
-border-radius:6px;
+.seat{
+background:#444;
+padding:15px;
+text-align:center;
+cursor:pointer;
+border-radius:5px;
+}
+
+.seat:hover{
+background:#666;
+}
+
+.selected{
+background:#00c853 !important;
+}
+
+.booked{
+background:red;
+cursor:not-allowed;
 }
 
 .summary{
-background:#1a1a2e;
+margin-top:20px;
+background:#222;
 padding:15px;
-border-radius:8px;
-margin-bottom:15px;
+border-radius:10px;
 }
 
 button{
-width:100%;
-padding:12px;
+padding:10px;
 background:#00c853;
 border:none;
 color:white;
 cursor:pointer;
-border-radius:6px;
 margin-top:10px;
-}
-
-button:hover{
-background:#00a844;
-}
-
-.success{
-display:none;
-margin-top:15px;
-background:#003300;
-padding:15px;
-border-radius:8px;
+width:100%;
 }
 </style>
 
@@ -79,36 +82,33 @@ border-radius:8px;
 
 <body>
 
+<div class="nav">
+<h2>Movie Ticket Booking</h2>
+<button onclick="logout()">Logout</button>
+</div>
+
 <div class="container">
 
-<h2>Payment</h2>
+<h3>Select Movie</h3>
+<select id="movie">
+<option>Avengers</option>
+<option>Batman</option>
+<option>Interstellar</option>
+<option>Spiderman</option>
+</select>
+
+<div class="screen"></div>
+
+<h3>Select Seats</h3>
+
+<div class="seats" id="seats"></div>
 
 <div class="summary">
-<p>Movie: <span id="movie"></span></p>
-<p>Seats: <span id="seats"></span></p>
-<p>Total: ₹<span id="total"></span></p>
+<p>Seats: <span id="count">0</span></p>
+<p>Total: ₹<span id="total">0</span></p>
+
+<button onclick="payment()">Proceed to Payment</button>
 </div>
-
-<div class="select">
-<label>Payment Method</label>
-<select id="method">
-<option>UPI</option>
-<option>Credit Card</option>
-<option>Debit Card</option>
-<option>Net Banking</option>
-</select>
-</div>
-
-<div class="select">
-<label>Enter Details</label>
-<input id="details" placeholder="Enter UPI / Card number">
-</div>
-
-<button onclick="pay()">Pay Now</button>
-
-<button onclick="download()">Download Ticket</button>
-
-<div class="success" id="success"></div>
 
 </div>
 
@@ -118,45 +118,55 @@ if(localStorage.getItem("login")!="true"){
 window.location="login.html"
 }
 
-document.getElementById("movie").innerText=localStorage.getItem("movie")
-document.getElementById("seats").innerText=localStorage.getItem("seats")
-document.getElementById("total").innerText=localStorage.getItem("total")
+const seatContainer=document.getElementById("seats")
+let total=0
+let count=0
+let selected=[]
 
-function pay(){
+for(let i=1;i<=40;i++){
+let seat=document.createElement("div")
+seat.classList.add("seat")
+seat.innerText=i
 
-if(details.value==""){
-alert("Enter payment details")
+seat.addEventListener("click",()=>{
+
+if(seat.classList.contains("selected")){
+seat.classList.remove("selected")
+count--
+total-=150
+selected=selected.filter(s=>s!=i)
+}else{
+seat.classList.add("selected")
+count++
+total+=150
+selected.push(i)
+}
+
+document.getElementById("count").innerText=count
+document.getElementById("total").innerText=total
+
+})
+
+seatContainer.appendChild(seat)
+}
+
+function payment(){
+
+if(selected.length==0){
+alert("Select seats")
 return
 }
 
-document.getElementById("success").style.display="block"
-document.getElementById("success").innerHTML=
-"Payment Successful <br><br>"+
-"Your ticket is confirmed"
+localStorage.setItem("seats",selected)
+localStorage.setItem("total",total)
+localStorage.setItem("movie",movie.value)
 
-localStorage.setItem("paid","true")
+window.location="payment.html"
 }
 
-function download(){
-
-if(localStorage.getItem("paid")!="true"){
-alert("Complete payment first")
-return
-}
-
-var content=
-"MOVIE TICKET\n\n"+
-"Movie: "+localStorage.getItem("movie")+"\n"+
-"Seats: "+localStorage.getItem("seats")+"\n"+
-"Total: ₹"+localStorage.getItem("total")+"\n"+
-"Status: Paid"
-
-var blob=new Blob([content],{type:"text/plain"})
-var a=document.createElement("a")
-a.href=URL.createObjectURL(blob)
-a.download="ticket.txt"
-a.click()
-
+function logout(){
+localStorage.removeItem("login")
+window.location="login.html"
 }
 
 </script>
