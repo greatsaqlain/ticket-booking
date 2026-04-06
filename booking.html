@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Online Ticket Booking</title>
+
+<style>
+body{
+font-family:Arial;
+background:#f4f4f4;
+}
+
+.container{
+width:500px;
+margin:20px auto;
+background:white;
+padding:20px;
+box-shadow:0 0 10px gray;
+}
+
+.seats{
+display:grid;
+grid-template-columns:repeat(5,1fr);
+gap:5px;
+margin-top:10px;
+}
+
+.seat{
+padding:10px;
+background:#eee;
+text-align:center;
+cursor:pointer;
+}
+
+.selected{
+background:green;
+color:white;
+}
+
+button{
+width:100%;
+padding:10px;
+margin-top:10px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<button onclick="logout()">Logout</button>
+
+<h2>Movie Ticket Booking</h2>
+
+<label>Name</label>
+<input type="text" id="name">
+
+<label>Select Movie</label>
+<select id="movie">
+<option>Avengers</option>
+<option>Batman</option>
+<option>Spiderman</option>
+<option>Interstellar</option>
+</select>
+
+<label>Date</label>
+<input type="date" id="date">
+
+<h3>Select Seats</h3>
+
+<div class="seats" id="seats"></div>
+
+<p>Price per seat: ₹150</p>
+<p>Total: ₹<span id="total">0</span></p>
+
+<button onclick="goPayment()">Proceed to Payment</button>
+
+</div>
+
+<script>
+
+if(localStorage.getItem("login")!="true"){
+window.location="login.html";
+}
+
+var seatContainer=document.getElementById("seats");
+var total=0;
+var selected=[];
+
+for(let i=1;i<=15;i++){
+let seat=document.createElement("div");
+seat.classList.add("seat");
+seat.innerText="A"+i;
+
+seat.onclick=function(){
+seat.classList.toggle("selected");
+
+if(selected.includes(seat.innerText)){
+selected=selected.filter(s=>s!=seat.innerText);
+total-=150;
+}else{
+selected.push(seat.innerText);
+total+=150;
+}
+
+document.getElementById("total").innerText=total;
+}
+
+seatContainer.appendChild(seat);
+}
+
+function goPayment(){
+
+var name=document.getElementById("name").value;
+var movie=document.getElementById("movie").value;
+var date=document.getElementById("date").value;
+
+if(name=="" || date=="" || selected.length==0){
+alert("Fill all fields");
+return;
+}
+
+var booking={
+name:name,
+movie:movie,
+date:date,
+seats:selected,
+total:total
+};
+
+localStorage.setItem("booking",JSON.stringify(booking));
+
+window.location="payment.html";
+}
+
+function logout(){
+localStorage.removeItem("login");
+window.location="login.html";
+}
+
+</script>
+
+</body>
+</html>
