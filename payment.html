@@ -4,30 +4,74 @@
 <title>Payment</title>
 
 <style>
-body{
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
 font-family:Arial;
-background:#f4f4f4;
 }
 
-.box{
+body{
+background:linear-gradient(135deg,#000000,#1a1a2e,#16213e);
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+color:white;
+}
+
+.container{
+background:#111;
+padding:30px;
+border-radius:12px;
 width:400px;
-margin:40px auto;
-background:white;
-padding:20px;
-box-shadow:0 0 10px gray;
+box-shadow:0 20px 40px rgba(0,0,0,0.6);
 }
 
-input,select,button{
+h2{
+margin-bottom:20px;
+}
+
+.select{
+margin-bottom:15px;
+}
+
+input,select{
 width:100%;
-padding:8px;
+padding:12px;
+border:none;
+margin-top:5px;
+border-radius:6px;
+}
+
+.summary{
+background:#1a1a2e;
+padding:15px;
+border-radius:8px;
+margin-bottom:15px;
+}
+
+button{
+width:100%;
+padding:12px;
+background:#00c853;
+border:none;
+color:white;
+cursor:pointer;
+border-radius:6px;
 margin-top:10px;
 }
 
-#ticket{
+button:hover{
+background:#00a844;
+}
+
+.success{
 display:none;
-background:#e7ffe7;
-padding:10px;
-margin-top:10px;
+margin-top:15px;
+background:#003300;
+padding:15px;
+border-radius:8px;
 }
 </style>
 
@@ -35,12 +79,17 @@ margin-top:10px;
 
 <body>
 
-<div class="box">
+<div class="container">
 
 <h2>Payment</h2>
 
-<p>Total Amount: ₹<span id="amount"></span></p>
+<div class="summary">
+<p>Movie: <span id="movie"></span></p>
+<p>Seats: <span id="seats"></span></p>
+<p>Total: ₹<span id="total"></span></p>
+</div>
 
+<div class="select">
 <label>Payment Method</label>
 <select id="method">
 <option>UPI</option>
@@ -48,72 +97,66 @@ margin-top:10px;
 <option>Debit Card</option>
 <option>Net Banking</option>
 </select>
+</div>
 
-<label>Card / UPI Number</label>
-<input type="text" id="number">
+<div class="select">
+<label>Enter Details</label>
+<input id="details" placeholder="Enter UPI / Card number">
+</div>
 
 <button onclick="pay()">Pay Now</button>
+
 <button onclick="download()">Download Ticket</button>
 
-<div id="ticket"></div>
+<div class="success" id="success"></div>
 
 </div>
 
 <script>
 
-var data=JSON.parse(localStorage.getItem("booking"));
-
-if(!data){
-window.location="booking.html";
+if(localStorage.getItem("login")!="true"){
+window.location="login.html"
 }
 
-document.getElementById("amount").innerText=data.total;
+document.getElementById("movie").innerText=localStorage.getItem("movie")
+document.getElementById("seats").innerText=localStorage.getItem("seats")
+document.getElementById("total").innerText=localStorage.getItem("total")
 
 function pay(){
 
-var num=document.getElementById("number").value;
-
-if(num==""){
-alert("Enter payment details");
-return;
+if(details.value==""){
+alert("Enter payment details")
+return
 }
 
-localStorage.setItem("paid","true");
+document.getElementById("success").style.display="block"
+document.getElementById("success").innerHTML=
+"Payment Successful <br><br>"+
+"Your ticket is confirmed"
 
-document.getElementById("ticket").style.display="block";
-
-document.getElementById("ticket").innerHTML=
-"<h3>Payment Successful</h3>"+
-"Name: "+data.name+"<br>"+
-"Movie: "+data.movie+"<br>"+
-"Seats: "+data.seats+"<br>"+
-"Date: "+data.date+"<br>"+
-"Total Paid: ₹"+data.total;
-
+localStorage.setItem("paid","true")
 }
 
 function download(){
 
 if(localStorage.getItem("paid")!="true"){
-alert("Complete payment first");
-return;
+alert("Complete payment first")
+return
 }
 
 var content=
-"ONLINE MOVIE TICKET\n\n"+
-"Name: "+data.name+"\n"+
-"Movie: "+data.movie+"\n"+
-"Seats: "+data.seats+"\n"+
-"Date: "+data.date+"\n"+
-"Total: ₹"+data.total+"\n"+
-"Status: PAID";
+"MOVIE TICKET\n\n"+
+"Movie: "+localStorage.getItem("movie")+"\n"+
+"Seats: "+localStorage.getItem("seats")+"\n"+
+"Total: ₹"+localStorage.getItem("total")+"\n"+
+"Status: Paid"
 
-var blob=new Blob([content],{type:"text/plain"});
-var a=document.createElement("a");
+var blob=new Blob([content],{type:"text/plain"})
+var a=document.createElement("a")
+a.href=URL.createObjectURL(blob)
+a.download="ticket.txt"
+a.click()
 
-a.href=URL.createObjectURL(blob);
-a.download="movie_ticket.txt";
-a.click();
 }
 
 </script>
