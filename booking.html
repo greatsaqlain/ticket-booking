@@ -7,27 +7,26 @@
 body{
 margin:0;
 font-family:Arial;
-background:#111;
+background:#0f172a;
 color:white;
 }
 
 .nav{
-background:#000;
+background:#020617;
 padding:15px;
 display:flex;
 justify-content:space-between;
-align-items:center;
 }
 
 .container{
-width:800px;
+width:900px;
 margin:auto;
 padding:20px;
 }
 
 .screen{
 background:white;
-height:100px;
+height:120px;
 margin:20px 0;
 transform:rotateX(-45deg);
 box-shadow:0 10px 20px rgba(255,255,255,0.5);
@@ -35,49 +34,43 @@ box-shadow:0 10px 20px rgba(255,255,255,0.5);
 
 .seats{
 display:grid;
-grid-template-columns:repeat(8,1fr);
-gap:10px;
+grid-template-columns:repeat(10,1fr);
+gap:8px;
 }
 
 .seat{
-background:#444;
-padding:15px;
+background:#1e293b;
+padding:12px;
 text-align:center;
 cursor:pointer;
-border-radius:5px;
+border-radius:6px;
 }
 
 .seat:hover{
-background:#666;
+background:#334155;
 }
 
 .selected{
-background:#00c853 !important;
-}
-
-.booked{
-background:red;
-cursor:not-allowed;
+background:#22c55e !important;
 }
 
 .summary{
 margin-top:20px;
-background:#222;
+background:#020617;
 padding:15px;
 border-radius:10px;
 }
 
 button{
-padding:10px;
-background:#00c853;
+padding:12px;
+background:#22c55e;
 border:none;
 color:white;
 cursor:pointer;
-margin-top:10px;
 width:100%;
+margin-top:10px;
 }
 </style>
-
 </head>
 
 <body>
@@ -100,7 +93,6 @@ width:100%;
 <div class="screen"></div>
 
 <h3>Select Seats</h3>
-
 <div class="seats" id="seats"></div>
 
 <div class="summary">
@@ -114,59 +106,47 @@ width:100%;
 
 <script>
 
-if(localStorage.getItem("login")!="true"){
-window.location="login.html"
-}
-
 const seatContainer=document.getElementById("seats")
 let total=0
 let count=0
 let selected=[]
 
-for(let i=1;i<=40;i++){
+for(let i=1;i<=50;i++){
 let seat=document.createElement("div")
 seat.classList.add("seat")
 seat.innerText=i
 
-seat.addEventListener("click",()=>{
+seat.onclick=function(){
 
-if(seat.classList.contains("selected")){
-seat.classList.remove("selected")
+seat.classList.toggle("selected")
+
+if(selected.includes(i)){
+selected=selected.filter(s=>s!=i)
 count--
 total-=150
-selected=selected.filter(s=>s!=i)
 }else{
-seat.classList.add("selected")
+selected.push(i)
 count++
 total+=150
-selected.push(i)
 }
 
 document.getElementById("count").innerText=count
 document.getElementById("total").innerText=total
 
-})
+}
 
 seatContainer.appendChild(seat)
 }
 
 function payment(){
-
-if(selected.length==0){
-alert("Select seats")
-return
-}
-
 localStorage.setItem("seats",selected)
 localStorage.setItem("total",total)
 localStorage.setItem("movie",movie.value)
-
 window.location="payment.html"
 }
 
 function logout(){
-localStorage.removeItem("login")
-window.location="login.html"
+window.location="index.html"
 }
 
 </script>
